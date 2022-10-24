@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    {{- include "amq-clients.labels" . | nindent 4 }}
+  name: "{{ .Values.amqClients.consumer.selector }}"
+  namespace: {{ include "amq-clients.namespace" . }}
+spec:
+  replicas: {{ .Values.amqClients.consumer.replicas }}
+  selector:
+    matchLabels:
+      app: "{{ .Values.amqClients.consumer.selector }}"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Values.amqClients.consumer.selector }}"
+    spec:
+      containers:
+      - image: registry.redhat.io/amq7/amq-broker-rhel8:7.10-42
+        name: "{{ .Values.amqClients.consumer.selector }}"
+        env:
+        - name: AMQ_BROKER_URL
+          value: 'tcp://{{ .Values.amqClients.brokerUrl }}.{{ include "amq-clients.namespace" . }}.svc.cluster.local:{{ .Values.amqClients.brokerPort }}'
+        - name: AMQ_USERNAME
+          value: "{{ .Values.amqClients.brokerUsername }}"
+        - name: AMQ_PASSWORD
+          value: "{{ .Values.amqClients.brokerPassword }}"
+        - name: AMQ_MESSAGE_COUNT
+          value: "{{ .Values.amqClients.consumer.messageCount }}"
+        - name: AMQ_MESSAGE_DELAY
+          value: "{{ .Values.amqClients.consumer.messageDelaySeconds }}"
+        - name: AMQ_MESSAGE_PROTOCOL
+          value: "{{ .Values.amqClients.consumer.protocol }}"
+        - name: AMQ_MESSAGE_QUEUE
+          value: "{{ .Values.amqClients.queue }}"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          $AMQ_HOME/bin/artemis consumer \
+          --url "${AMQ_BROKER_URL}" --user "${AMQ_USERNAME}" --password "${AMQ_PASSWORD}" \
+          --message-count "${AMQ_MESSAGE_COUNT}" \
+          --protocol "${AMQ_MESSAGE_PROTOCOL}" \
+          --destination "queue://${AMQ_MESSAGE_QUEUE}" \
+          --sleep ${AMQ_MESSAGE_DELAY} --verbose
+
+        resources:
+          requests:
+            cpu: 50m
+            memory: 56Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi

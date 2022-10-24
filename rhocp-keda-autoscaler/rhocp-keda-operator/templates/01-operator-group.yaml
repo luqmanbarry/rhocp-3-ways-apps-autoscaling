@@ -1,0 +1,10 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  annotations:
+    olm.providedAPIs: ''
+  name: keda-{{ include "rhocp-keda-operator.namespace" . }}
+  namespace: {{ include "rhocp-keda-operator.namespace" . }}
+  labels:
+    {{- include "rhocp-keda-operator.labels" . | nindent 4 }}
+spec: {}

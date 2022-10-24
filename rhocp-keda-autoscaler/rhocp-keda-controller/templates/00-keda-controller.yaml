@@ -1,0 +1,15 @@
+kind: KedaController
+apiVersion: keda.sh/v1alpha1
+metadata:
+  name: keda
+  labels:
+    {{- include "rhocp-keda-controller.labels" . | nindent 4 }}
+  namespace: {{ include "rhocp-keda-controller.namespace" . }}
+spec:
+  watchNamespace: '' 
+  operator:
+    logLevel: info 
+    logEncoder: console 
+  metricsServer:
+    logLevel: '0' 
+  serviceAccount: {}

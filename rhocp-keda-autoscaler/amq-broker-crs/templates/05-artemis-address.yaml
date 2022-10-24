@@ -1,0 +1,11 @@
+apiVersion: broker.amq.io/v1beta1
+kind: ActiveMQArtemisAddress
+metadata:
+  name: amq-keda-address
+  labels:
+    {{- include "amq-broker-crs.labels" . | nindent 4 }}
+  namespace: {{ include "amq-broker-crs.namespace" . }}
+spec:
+  addressName: amqKedaDemo
+  queueName: amqKedaDemo
+  routingType: anycast

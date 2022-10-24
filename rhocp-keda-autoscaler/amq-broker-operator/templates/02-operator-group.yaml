@@ -1,0 +1,12 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  annotations:
+    olm.providedAPIs: ''
+  name: amq-{{ include "amq-broker-operator.namespace" . }}
+  namespace: {{ include "amq-broker-operator.namespace" . }}
+  labels:
+    {{- include "amq-broker-operator.labels" . | nindent 4 }}
+spec:
+  targetNamespaces:
+    - {{ include "amq-broker-operator.namespace" . }}

@@ -1,0 +1,44 @@
+{{- range $component := .Values.keda.components }}
+{{ if $component.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: "{{ $component.name }}-scaledobject"
+  labels:
+    {{- include "rhocp-keda-crs.labels" $ | nindent 4 }}
+  namespace: {{ include "rhocp-keda-crs.namespace" $ }}
+spec:
+  scaleTargetRef:
+    apiVersion: "{{ $component.apiVersion }}"
+    name: "{{ $component.name }}"
+    kind: "{{ $component.kind }}"
+  minReplicaCount: {{ $component.minReplicas }}
+  maxReplicaCount: {{ $component.maxReplicas }}
+  pollingInterval: 10
+  cooldownPeriod: 300
+  advanced:
+    restoreToOriginalReplicaCount: true 
+    horizontalPodAutoscalerConfig:
+      behavior: 
+        scaleDown:
+          stabilizationWindowSeconds: 300
+          policies:
+          - type: Percent
+            value: 100
+            periodSeconds: 10
+  triggers:
+  - type: prometheus
+    metadata:
+      serverAddress: {{ $.Values.prometheus.serverUrl }}
+      namespace: {{ include "rhocp-keda-crs.namespace" $ }}
+      authModes: "bearer"
+      metricName: "{{ $component.metricName }}"
+      threshold: '10'
+      query: "{{ $component.metricQuery }}"
+    authenticationRef:
+      name: {{ $.Values.keda.authTriggerName }}
+    # Supported Values: "Value", "AverageValue", "Utilization"
+    metricType: "Value"
+    name: prometheus
+{{ end }}
+{{ end }}

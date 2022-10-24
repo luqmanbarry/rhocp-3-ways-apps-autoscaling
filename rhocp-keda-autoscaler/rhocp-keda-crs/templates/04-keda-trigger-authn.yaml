@@ -1,0 +1,13 @@
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: {{ .Values.keda.authTriggerName }}
+  namespace: {{ include "rhocp-keda-crs.namespace" . }}
+spec:
+  secretTargetRef: 
+  - parameter: bearerToken 
+    name: {{ .Values.prometheus.auth.serviceAccountToken }}
+    key: token 
+  - parameter: ca
+    name: {{ .Values.prometheus.auth.serviceAccountToken }}
+    key: ca.crt

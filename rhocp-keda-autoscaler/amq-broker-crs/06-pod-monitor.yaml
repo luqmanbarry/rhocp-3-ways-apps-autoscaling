@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  labels:
+    {{- include "amq-broker-crs.labels" . | nindent 4 }}
+  name: "amq-keda-podmonitor"
+spec:
+  podMetricsEndpoints:
+  - interval: 10s
+    path: /metrics
+    port: prometheus
+  podTargetLabels:
+  - operator
+  selector:
+    matchLabels:
+      operator: amq-keda

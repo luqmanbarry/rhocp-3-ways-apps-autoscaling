@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.prometheus.auth.serviceAccountName }}
+  labels:
+    {{- include "rhocp-keda-crs.labels" . | nindent 4 }}
+  namespace: {{ include "rhocp-keda-crs.namespace" . }}

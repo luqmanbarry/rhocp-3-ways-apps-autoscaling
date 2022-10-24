@@ -1,0 +1,23 @@
+
+monitoring:
+  enabled: false
+
+prometheus:
+  serverUrl: https://thanos-querier.openshift-monitoring.svc.cluster.local:9092
+  auth:
+    serviceAccountName: thanos-metrics-reader
+    serviceAccountToken: thanos-metrics-reader-token-xxxx
+
+keda:
+  authTriggerName: keda-trigger-auth-prometheus
+  components:
+  - name: amq-keda-consumer
+    enabled: true
+    kind: Deployment
+    apiVersion: apps/v1
+    minReplicas: "1"
+    maxReplicas: "20"
+    selector: amq-keda-consumer
+    metricName: artemis_message_count
+    metricQuery: artemis_message_count{namespace='amq-keda',queue='amqKedaDemo'} > 500
+

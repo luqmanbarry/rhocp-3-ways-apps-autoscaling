@@ -1,0 +1,34 @@
+apiVersion: broker.amq.io/v1beta1
+kind: ActiveMQArtemis
+metadata:
+  name: amq-keda
+  labels:
+    {{- include "amq-broker-crs.labels" . | nindent 4 }}
+  namespace: {{ include "amq-broker-crs.namespace" . }}
+spec:
+  deploymentPlan:
+    size: 1
+    image: placeholder
+    requireLogin: false
+    persistenceEnabled: true
+    journalType: nio
+    messageMigration: false
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1024Mi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    labels:
+      {{- include "amq-broker-crs.labels" . | nindent 6 }}
+    storage:
+      size: "5Gi"
+    jolokiaAgentEnabled: true
+    managementRBACEnabled: false
+    enableMetricsPlugin: true
+  console:
+    expose: true
+  upgrades:
+    enabled: false
+    minor: false

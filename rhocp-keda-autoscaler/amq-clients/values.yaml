@@ -1,0 +1,19 @@
+amqClients:
+  queue: "amqKedaDemo"
+  brokerUrl: "amq-keda-hdls-svc"
+  brokerPort: "61616"
+  brokerUsername: "admin"
+  brokerPassword: "admin"
+  producer:
+    replicas: "1"
+    selector: amq-keda-producer
+    messageCount: "1000000"
+    messageSize: "1024"
+    protocol: "core"
+    messageDelaySeconds: "2" 
+  consumer:
+    replicas: "1"
+    selector: amq-keda-consumer
+    messageCount: "1000000"
+    protocol: "core"
+    messageDelaySeconds: "5" 

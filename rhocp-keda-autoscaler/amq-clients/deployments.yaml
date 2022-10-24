@@ -1,0 +1,124 @@
+---
+# Source: amq-clients/templates/consumer-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    operator: amq-keda
+    owned-by: custom-metrics-scaler
+    helm.sh/chart: amq-clients-0.1.0
+    app.kubernetes.io/name: amq-clients
+    app.kubernetes.io/instance: test
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  name: "amq-keda-consumer"
+  namespace: amq-keda
+spec:
+  replicas: "1"
+  selector:
+    matchLabels:
+      app: "amq-keda-consumer"
+  template:
+    metadata:
+      labels:
+        app: "amq-keda-consumer"
+    spec:
+      containers:
+      - image: registry.redhat.io/amq7/amq-broker-rhel8:7.10-42
+        name: "amq-keda-consumer"
+        env:
+        - name: AMQ_BROKER_URL
+          value: 'tcp://amq-keda-hdls-svc.amq-keda.svc.cluster.local:61616'
+        - name: AMQ_USERNAME
+          value: "admin"
+        - name: AMQ_PASSWORD
+          value: "admin"
+        - name: AMQ_MESSAGE_COUNT
+          value: "1000000"
+        - name: AMQ_MESSAGE_DELAY
+          value: "5"
+        - name: AMQ_MESSAGE_PROTOCOL
+          value: "core"
+        - name: AMQ_MESSAGE_QUEUE
+          value: "amqKedaDemo"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          $AMQ_HOME/bin/artemis consumer \
+          --url "${AMQ_BROKER_URL}" --user "${AMQ_USERNAME}" --password "${AMQ_PASSWORD}" \
+          --message-count "${AMQ_MESSAGE_COUNT}" \
+          --message-size "${AMQ_MESSAGE_SIZE}" --protocol "${AMQ_MESSAGE_PROTOCOL}" \
+          --destination "queue://${AMQ_MESSAGE_QUEUE}" \
+          --sleep ${AMQ_MESSAGE_DELAY} --verbose
+
+        resources:
+          requests:
+            cpu: 50m
+            memory: 56Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+---
+# Source: amq-clients/templates/producer-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    operator: amq-keda
+    owned-by: custom-metrics-scaler
+    helm.sh/chart: amq-clients-0.1.0
+    app.kubernetes.io/name: amq-clients
+    app.kubernetes.io/instance: test
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  name: "amq-keda-producer"
+  namespace: amq-keda
+spec:
+  replicas: "1"
+  selector:
+    matchLabels:
+      app: "amq-keda-producer"
+  template:
+    metadata:
+      labels:
+        app: "amq-keda-producer"
+    spec:
+      containers:
+      - image: registry.redhat.io/amq7/amq-broker-rhel8:7.10-42
+        name: "amq-keda-producer"
+        env:
+        - name: AMQ_BROKER_URL
+          value: 'tcp://amq-keda-hdls-svc.amq-keda.svc.cluster.local:61616'
+        - name: AMQ_USERNAME
+          value: "admin"
+        - name: AMQ_PASSWORD
+          value: "admin"
+        - name: AMQ_MESSAGE_COUNT
+          value: "1000000"
+        - name: AMQ_MESSAGE_SIZE
+          value: "1024"
+        - name: AMQ_MESSAGE_DELAY
+          value: "2"
+        - name: AMQ_MESSAGE_PROTOCOL
+          value: "core"
+        - name: AMQ_MESSAGE_QUEUE
+          value: "amqKedaDemo"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          $AMQ_HOME/bin/artemis producer \
+          --url "${AMQ_BROKER_URL}" --user "${AMQ_USERNAME}" --password "${AMQ_PASSWORD}" \
+          --message-count "${AMQ_MESSAGE_COUNT}" \
+          --message-size "${AMQ_MESSAGE_SIZE}" --protocol "${AMQ_MESSAGE_PROTOCOL}" \
+          --destination "queue://${AMQ_MESSAGE_QUEUE}" \
+          --sleep ${AMQ_MESSAGE_DELAY} --verbose
+
+        resources:
+          requests:
+            cpu: 50m
+            memory: 56Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi

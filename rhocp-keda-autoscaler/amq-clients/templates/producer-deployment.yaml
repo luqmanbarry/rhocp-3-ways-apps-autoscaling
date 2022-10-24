@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    {{- include "amq-clients.labels" . | nindent 4 }}
+  name: "{{ .Values.amqClients.producer.selector }}"
+  namespace: {{ include "amq-clients.namespace" . }}
+spec:
+  replicas: {{ .Values.amqClients.producer.replicas }}
+  selector:
+    matchLabels:
+      app: "{{ .Values.amqClients.producer.selector }}"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Values.amqClients.producer.selector }}"
+    spec:
+      containers:
+      - image: registry.redhat.io/amq7/amq-broker-rhel8:7.10-42
+        name: "{{ .Values.amqClients.producer.selector }}"
+        env:
+        - name: AMQ_BROKER_URL
+          value: 'tcp://{{ .Values.amqClients.brokerUrl }}.{{ include "amq-clients.namespace" . }}.svc.cluster.local:{{ .Values.amqClients.brokerPort }}'
+        - name: AMQ_USERNAME
+          value: "{{ .Values.amqClients.brokerUsername }}"
+        - name: AMQ_PASSWORD
+          value: "{{ .Values.amqClients.brokerPassword }}"
+        - name: AMQ_MESSAGE_COUNT
+          value: "{{ .Values.amqClients.producer.messageCount }}"
+        - name: AMQ_MESSAGE_SIZE
+          value: "{{ .Values.amqClients.producer.messageSize }}"
+        - name: AMQ_MESSAGE_DELAY
+          value: "{{ .Values.amqClients.producer.messageDelaySeconds }}"
+        - name: AMQ_MESSAGE_PROTOCOL
+          value: "{{ .Values.amqClients.producer.protocol }}"
+        - name: AMQ_MESSAGE_QUEUE
+          value: "{{ .Values.amqClients.queue }}"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          $AMQ_HOME/bin/artemis producer \
+          --url "${AMQ_BROKER_URL}" --user "${AMQ_USERNAME}" --password "${AMQ_PASSWORD}" \
+          --message-count "${AMQ_MESSAGE_COUNT}" \
+          --message-size "${AMQ_MESSAGE_SIZE}" --protocol "${AMQ_MESSAGE_PROTOCOL}" \
+          --destination "queue://${AMQ_MESSAGE_QUEUE}" \
+          --sleep ${AMQ_MESSAGE_DELAY} --verbose
+
+        resources:
+          requests:
+            cpu: 50m
+            memory: 56Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
