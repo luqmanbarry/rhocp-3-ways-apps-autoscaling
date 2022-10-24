@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "cronjob-scaler.name" . }}-scale-up
+  namespace: {{ include "cronjob-scaler.namespace" . }}
+  labels:
+    {{- include "cronjob-scaler.labels" . | nindent 4 }}
+spec:
+  schedule: "{{ .Values.scaleActions.scaleUp.schedule }}"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "cronjob-scaler.labels" . | nindent 12 }}
+        spec:
+          serviceAccountName: "{{ .Values.serviceAccountName }}"
+          serviceAccount: "{{ .Values.serviceAccountName }}"
+          restartPolicy: Never
+          containers:
+          - name: {{ include "cronjob-scaler.name" . }}-scale-up
+            image: registry.redhat.io/openshift4/ose-cli:v4.10
+            command:
+            - /bin/sh
+            - -c
+            - |
+                set -x
+            {{- range $component := .Values.scaleActions.scaleUp.components }}
+                oc scale {{ $component.resourceType }}/{{ $component.name }} --replicas={{ $component.replicas }}
+            {{- end }}
+---

@@ -1,0 +1,130 @@
+pipeline {
+    agent {
+        node {
+            label 'centos-large'
+        }
+    }
+
+    parameters {
+        string(name: 'ocTokenCredentialsId', defaultValue: 'ocp-jenkins-sa', description: 'Token used by the OpenShift CLI to authenticate.', trim: true)
+        choice(name: 'scaleType', choices: ['CRON_JOB', 'HPA_CPU_MEMORY', 'HPA_CUSTOM_METRIC'], description: 'Scale types.')
+        string(name: 'targetNamespace', defaultValue: 'test-ns', description: 'The target namespace to deploy the resources.', trim: true)
+        string(name: 'scaleUpCronSchedule', defaultValue: '0 3 * * *', description: 'The cron schedule when components need to be scaled up in UTC TZ.', trim: true)
+        string(name: 'scaleDownCronSchedule', defaultValue: '0 5 * * *', description: 'The cron schedule when components need to be scaled down in UTC TZ.', trim: true)
+        string(name: 'valuesFile', defaultValue: './cronjob-scaler/values.yaml', description: 'The path to the values file.', trim: true)
+    }
+
+    options {
+        timeout(time: 30, unit: 'MINUTES') 
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '20', daysToKeepStr: '30'))
+        disableConcurrentBuilds()
+        disableResume()
+    }
+
+    environment { 
+        OCP_LOGIN                         = credentials("${params.ocTokenCredentialsId}")
+        SCALE_TYPE                        = "${params.scaleType}"
+        NAMESPACE                         = "${params.targetNamespace}"
+        SCALE_UP_SCHEDULE                 = "${params.scaleUpCronSchedule}"
+        SCALE_DOWN_SCHEDULE               = "${params.scaleDownCronSchedule}"
+        VALUES_FILE                       = "${params.valuesFile}"
+    }
+
+    stages {
+        stage("Verify Tools") {
+            steps {
+                sh ' echo "  Verying required tools are installed  " '
+                sh '  echo "Verify HELM is installed." '
+                sh '''
+                    if ! helm version | grep 'v3'
+                    then
+                        echo "Helm v3.x could not be found."
+                        exit -1
+                    fi
+                '''
+                sh ' echo "  Verify OpenShift cli is installed.    " '
+                sh '''
+                    if ! oc version | grep 'Client Version: 4'
+                    then
+                        echo "oc cli v4.x could not be found."
+                        exit -1
+                    fi
+                '''
+            }
+        }
+        stage("OCP Login") {
+            steps {
+                retry(3) {
+                    sh ' echo "    Installing the helm chart...        " '
+                    sh ' oc login "${OCP_LOGIN_USR}" --token "${OCP_LOGIN_PSW}" '
+                    sh ' oc project ${NAMESPACE} '
+                }
+            }
+        }
+        stage("Deploy CronJob Scalers") {
+            when {
+                anyOf {
+                    environment name: 'scaleType', value: 'CRON_JOB'
+                }
+            }
+            steps {
+                retry(3) {
+                    sh '''
+                        echo "Only one type of scaler is allowed per namespace.."
+                        helm uninstall cronjob-scaler || true
+                        helm uninstall hpa-cpu-memory-scaler || true
+                        helm upgrade --install cronjob-scaler ./cronjob-scaler \
+                            --set scaleActions.scaleUp.schedule="${SCALE_UP_SCHEDULE}" \
+                            --set scaleActions.scaleDown.schedule="${SCALE_DOWN_SCHEDULE}" \
+                            -f ${VALUES_FILE} \
+                            -n ${NAMESPACE}
+                        sleep 30
+                    '''
+                }
+            }
+        }
+        stage("Deploy HPA Scalers"){
+            when {
+                anyOf {
+                    environment name: 'scaleType', value: 'HPA_CPU_MEMORY'
+                }
+            }
+            steps {
+                retry(3){
+                    sh '''
+                        echo "Only one type of scaler is allowed per namespace.."
+                        echo "Deploying HPA scalers."
+                        helm uninstall cronjob-scaler || true
+                        helm uninstall hpa-cpu-memory-scaler || true
+                        helm upgrade --install hpa-cpu-memory-scaler ./hpa-cpu-memory-scaler \
+                            -f ${VALUES_FILE} \
+                            -n ${NAMESPACE}
+                        sleep 30
+                    '''
+                }
+            }
+        }
+        stage("Deploy HPA Custom Metrics Scalers"){
+            when {
+                anyOf {
+                    environment name: 'scaleType', value: 'HPA_CUSTOM_METRICS'
+                }
+            }
+            steps {
+                retry(3) {
+                    sh '''
+                        echo "Deploying HPA Custom Metrics Scalers"
+                    '''
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo "Terminating OCP user session..."
+            sh 'oc logout &> /dev/null'
+            deleteDir()
+        }
+    }
+}

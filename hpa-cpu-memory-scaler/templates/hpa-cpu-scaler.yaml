@@ -1,0 +1,43 @@
+{{ range $app := .Values.hpa.scaleTargets }}
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app: {{ $app.name }}
+    {{- include "hpa-cpu-memory-scaler.labels" $ | nindent 4 }}
+  name: "{{ $app.name }}-hpa-cpu"
+  namespace: {{ include "hpa-cpu-memory-scaler.namespace" $ }}
+spec:
+  maxReplicas: {{ $app.maxReplicas }}
+  minReplicas: {{ $app.minReplicas }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: {{ $app.kind }}
+    name: {{ $app.name }}
+  # targetCPUUtilizationPercentage: {{ $.Values.hpa.targetCPUScalePercentage }}
+  
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: {{ $.Values.hpa.targetCPUScalePercentage }}
+
+  behavior:
+    scaleDown: 
+      policies: 
+      - type: Pods 
+        value: 1 
+        periodSeconds: 90 
+      selectPolicy: Min 
+      stabilizationWindowSeconds: {{ $.Values.hpa.scaleDownStabilizationPeriodSeconds }} 
+    scaleUp: 
+      policies:
+      - type: Pods
+        value: 1 
+        periodSeconds: 60
+      selectPolicy: Min
+      stabilizationWindowSeconds: {{ $.Values.hpa.scaleUpStabilizationPeriodSeconds }}
+---
+{{- end }}

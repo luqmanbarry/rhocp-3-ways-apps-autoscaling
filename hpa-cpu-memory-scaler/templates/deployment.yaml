@@ -1,0 +1,57 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: loadtest
+  name: loadtest
+  # namespace: loadtest-scaler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loadtest
+  template:
+    metadata:
+      labels:
+        app: loadtest
+    spec:
+      containers:
+      - image: quay.io/redhattraining/loadtest:v1.0
+        name: loadtest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 150Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: loadtest
+  name: loadtest
+  # namespace: loadtest-scaler
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: loadtest
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  creationTimestamp: null
+  labels:
+    app: loadtest
+  name: loadtest
+  # namespace: loadtest-scaler
+spec:
+  host: loadtest-hpa.r-us-tst-01.apps.ws-00s3.bpaws.com
+  to:
+    kind: Service
+    name: loadtest

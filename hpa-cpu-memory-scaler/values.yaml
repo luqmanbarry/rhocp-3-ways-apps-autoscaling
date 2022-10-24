@@ -1,0 +1,22 @@
+
+hpa:
+  targetCPUScalePercentage: 50
+  scaleDownStabilizationPeriodSeconds: 60
+  scaleUpStabilizationPeriodSeconds: 60
+  scaleTargets:
+  - name: loadtest
+    kind: Deployment
+    maxReplicas: 5
+    minReplicas: 1
+  # - name: app1
+  #   kind: Deployment
+  #   maxReplicas: 2
+  #   minReplicas: 1
+  # - name: app2
+  #   kind: Deployment
+  #   maxReplicas: 2
+  #   minReplicas: 1
+  # - name: app3
+  #   kind: Deployment
+  #   maxReplicas: 2
+  #   minReplicas: 1

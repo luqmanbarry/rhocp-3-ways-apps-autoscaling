@@ -1,0 +1,30 @@
+
+serviceAccountName: cronjob-scaler
+
+scaleActions:
+  scaleUp:
+    # Provide input in Cron Format -- Date/Time must be in UTC time zone
+    schedule: "0 3 * * *"  
+    components:
+    - name: app1
+      resourceType: Deployment
+      replicas: 2
+    - name: app2
+      resourceType: Deployment
+      replicas: 2
+    - name: app3
+      resourceType: Deployment
+      replicas: 2
+  scaleDown:
+    # Provide input in Cron Format -- Date/Time must be in UTC time zone
+    schedule: "0 5 * * *" 
+    components:
+    - name: app1
+      resourceType: Deployment
+      replicas: 1
+    - name: app2
+      resourceType: Deployment
+      replicas: 1
+    - name: app3
+      resourceType: Deployment
+      replicas: 1
