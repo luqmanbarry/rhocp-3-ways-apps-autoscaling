@@ -24,8 +24,9 @@ spec:
             - /bin/sh
             - -c
             - |
-                set -x
+                set -e
             {{- range $component := .Values.scaleActions.scaleUp.components }}
-                oc scale {{ $component.resourceType }}/{{ $component.name }} --replicas={{ $component.replicas }}
+                oc patch {{ $component.resourceType }}/{{ $component.name }} --type='json' -p='[{"op": "replace", "path": "/spec/replicas", "value": "{{ $component.replicas }}" }'
             {{- end }}
+                set +e
 ---
