@@ -18,47 +18,7 @@ The following metrics are supported by horizontal pod autoscalers:
 ### Pre-Requisites
 
 - Access to an OpenShift/Kubernetes cluster
-- ServiceAccount with permission to  create `HorizontalPodAutoscaler`.
-  Here's a sample `ServiceAccount, ClusterRole, ClusterRoleBinding` templates. _Do not create these resoures if there is a SA with required access on the target namespace; use that instead._
-  ```
-  ---
-    apiVersion: v1
-    kind: ServiceAccount
-    metadata:
-      name: cronjob-scaler
-      namespace: {{ include "cronjob-scaler.namespace" . }}
-    labels:
-        {{- include "cronjob-scaler.labels" . | nindent 4 }}
-    ---
-    apiVersion: rbac.authorization.k8s.io/v1
-    kind: ClusterRole
-    metadata:
-      name: cronjob-scaler
-    rules:
-    - apiGroups: ["*"]
-      resources: ["Pods"]
-      verbs: ["get", "list"]
-    - apiGroups: ["apps", "extensions"]
-      resources: ["DeploymentConfigs", "Deployments", "StatefulSets"]
-      verbs: ["get", "list", "patch"]
-    - apiGroups: ["autoscaling/v1", "autoscaling/v2beta2"]
-      resources: ["HorizontalPodAutoscaler"]
-      verbs: ["get", "list", "patch", "create"]
-    ---
-    apiVersion: rbac.authorization.k8s.io/v1
-    kind: ClusterRoleBinding
-    metadata:
-      name: cronjob-scaler
-    subjects:
-    - kind: ServiceAccount
-      name: cronjob-scaler
-      namespace: {{ include "cronjob-scaler.namespace" . }}
-    roleRef:
-      apiGroup: rbac.authorization.k8s.io
-      kind: ClusterRole
-      name: cronjob-scaler
-  ```
-
+- Workstation with `oc, helm` binaries installed
 
 ### Procedure
 
