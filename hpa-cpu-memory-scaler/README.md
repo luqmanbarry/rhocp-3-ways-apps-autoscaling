@@ -22,7 +22,7 @@ The following metrics are supported by horizontal pod autoscalers:
 
 ### Procedure
 
-#### 1. Identify deployables target for scheduled scaling
+#### 1. Identify deployables target for HPA based scaling
 
 `DepoymentConfig, Deployment, StatefulSet` are examples of scalable kubernetes objects.
 
