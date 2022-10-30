@@ -23,7 +23,7 @@ Helm with bash are used to manage templatization and automation needs.
 
 Take a look at each individual script in the `shell-scripts` directory to understand where and how each component is deployed.
 
-`custom-metrics-scaler` will be used as the root directory throughout the steps that follow.
+`rhocp-keda-scaler` will be used as the root directory throughout the steps that follow.
 
 To deploy the entire solution with one command, execute the `sh shell-scripts/install.sh` script.
 
