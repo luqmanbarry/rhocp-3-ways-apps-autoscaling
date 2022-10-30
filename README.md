@@ -4,5 +4,5 @@
 
 ## 2. Scaling apps based on cpu/memory: Follow [this link](./hpa-cpu-memory-scaler/README.md).
 
-## 3. Scaling apps based on custom metrics; for example AMQ Artemis Message Count: Follow [this link](./rhocp-keda-autoscaler/README.md).
+## 3. Scaling apps based on custom metrics; for example AMQ Artemis Message Count: Follow [this link](./rhocp-keda-scaler/README.md).
 
