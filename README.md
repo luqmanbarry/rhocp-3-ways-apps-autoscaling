@@ -351,7 +351,7 @@ In this article we’ve learned 3 different methods of natively automating horiz
 * [https://docs.openshift.com/container-platform/4.10/nodes/jobs/nodes-nodes-jobs.html#nodes-nodes-jobs-about_nodes-nodes-jobs](https://docs.openshift.com/container-platform/4.10/nodes/jobs/nodes-nodes-jobs.html#nodes-nodes-jobs-about_nodes-nodes-jobs)
 * [https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/)
 
-## 	Git Repositories
+## 	Apps Scaler Repositories
 
 * cronjob-scaler: [https://github.com/luqmanbarry/rhocp-3-ways-apps-autoscaling/tree/master/cronjob-scaler](https://github.com/luqmanbarry/rhocp-3-ways-apps-autoscaling/tree/master/cronjob-scaler)
 * hpa-cpu-memory-scaler: [https://github.com/luqmanbarry/rhocp-3-ways-apps-autoscaling/tree/master/hpa-cpu-memory-scaler](https://github.com/luqmanbarry/rhocp-3-ways-apps-autoscaling/tree/master/hpa-cpu-memory-scaler)
