@@ -18,6 +18,8 @@ Helm helps you manage Kubernetes applications — Helm Charts help you define, i
 
 To find out more about the benefits of Helm, follow [this link](https://www.cncf.io/blog/2020/08/26/why-do-devops-engineers-love-helm/).
 
+**To get the most out of this content, foundational understanding of Kubernetes and Helm is recommended.**
+
 _Helm charts were tested on [Red Hat OpenShift Container Platform](https://docs.openshift.com/container-platform/4.10/welcome/index.html) (RHOCP 4.10+)._
 
 # Scaling applications pods based on a schedule
