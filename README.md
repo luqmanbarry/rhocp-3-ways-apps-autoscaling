@@ -20,6 +20,8 @@ Pod-based horizontal scaling will be the main focus of this article. We will dis
 
 Helm helps you manage Kubernetes applications — Helm Charts help you define, install, and upgrade even the most complex Kubernetes application. Charts are easy to create, version, share, and publish. – _Helm.sh_
 
+All of the different methods discussed  are implemented using Helm to make it easy to templatize the kubernetes resources manifests; as well as to dynamically handle the need to have the same templates applied to multiple applications deployables by merely declaring app details  in the helm values.yaml files.
+
 To find out more about the benefits of Helm, follow [this link](https://www.cncf.io/blog/2020/08/26/why-do-devops-engineers-love-helm/).
 
 **To get the most out of this content, foundational understandings of Kubernetes and Helm are recommended.**
@@ -35,7 +37,7 @@ _Helm charts were tested on [Red Hat OpenShift Container Platform](https://docs.
 
 Schedule based scaling uses OpenShift/Kubernetes native resources called CronJob that execute a task periodically (date + time) written in [Cron](https://en.wikipedia.org/wiki/Cron) format. The [scale-up-cronjob.yaml](https://github.com/luqmanbarry/rhocp-3-ways-apps-autoscaling/blob/master/cronjob-scaler/templates/scale-up-cronjob.yaml) template handles patching the deployables to increase their pod replicas; while the [scale-down-cronjob.yaml](https://github.com/luqmanbarry/rhocp-3-ways-apps-autoscaling/blob/master/cronjob-scaler/templates/scale-down-cronjob.yaml) scales them down. Furthermore, the [values.yaml](https://github.com/luqmanbarry/rhocp-3-ways-apps-autoscaling/blob/master/cronjob-scaler/values.yaml) is where details about apps and their scaling specs are declared. Each of these two CronJobs run an **oc patch** command as _entrypoint_ command. 
 
-The [CronJob](https://docs.openshift.com/container-platform/4.10/nodes/jobs/nodes-nodes-jobs.html#nodes-nodes-jobs-about_nodes-nodes-jobs) `schedule: "0 22 * * *"` times are based on the time zone of the [kube-controller-manager](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/). Unless overridden by the Pod (Container Image or Pod Spec), you can find the kube-controller-manager time zone by creating a sample pod and running the **$ date** command in its terminal.
+The [CronJob](https://docs.openshift.com/container-platform/4.10/nodes/jobs/nodes-nodes-jobs.html#nodes-nodes-jobs-about_nodes-nodes-jobs) `schedule: "0 22 * * *"` times are based on the time zone of the [kube-controller-manager](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/). Unless overridden by the Pod (Container Image or Pod Spec), you can find the kube-controller-manager time zone by creating a sample pod and running the `date` command in its terminal.
 
 
 ## Implementation
@@ -134,7 +136,7 @@ oc delete cronjob -l app=cronjob-scaler
 As a developer, you can use a horizontal pod autoscaler (HPA) to specify how OpenShift Container Platform should automatically increase or decrease the scale of a replication controller or deployment configuration, based on metrics collected from the pods that belong to that replication controller or deployment configuration. You can create an HPA for any deployment, deployment config, replica set, replication controller, or stateful set. -- OpenShift Docs
 
 
-Supported metrics The following metrics are supported by horizontal pod autoscaler (HPA):
+The following metrics are supported by horizontal pod autoscaler (HPA):
 
 
 <table>
@@ -223,7 +225,7 @@ sleep 30
 
 #### Watch HorizontalPodAutoscaler in Action
 
-The **loadtest** k8s Deployment in the chart is just an example. 
+The `loadtest` k8s Deployment in the chart is just an example. The curl command will make an API call causing the app CPU to spike.
 
 
 ```
