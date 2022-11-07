@@ -106,11 +106,7 @@ scaleActions:
 ```
 helm uninstall cronjob-scaler || true
 
-helm upgrade --install cronjob-scaler ./cronjob-scaler \
-    --set scaleActions.scaleUp.schedule="${SCALE_UP_SCHEDULE}" \
-    --set scaleActions.scaleDown.schedule="${SCALE_DOWN_SCHEDULE}" \
-    -f ${VALUES_FILE} \
-    -n ${NAMESPACE}
+helm upgrade --install cronjob-scaler ./cronjob-scaler
 sleep 30
 ```
 
