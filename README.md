@@ -1,6 +1,6 @@
 # 3 Methods of “Auto” Scaling OpenShift Applications
 
-![OpenShift KEDA](./assets/autoscaling-metrics.png)
+![OpenShift KEDA](./assets/autoscaling-metrics2.png)
 
 [Red Hat OpenShift Container Platform](https://docs.openshift.com/container-platform/4.10/welcome/index.html) (RHOCP) makes it easy for developers to deploy kubernetes-native solutions that can automatically handle apps' horizontal scaling needs, as well as many other types of management tasks, including provisioning and scaling. 
 
