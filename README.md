@@ -28,7 +28,7 @@ _Helm charts were tested on [Red Hat OpenShift Container Platform](https://docs.
 
 <br />
 
-# Scaling applications pods based on a schedule
+# Method #1: Scaling applications pods based on a schedule
 <br />
 
 ## Overview
@@ -127,7 +127,7 @@ oc delete cronjob -l app=cronjob-scaler
 
 <br />
 
-# Scaling apps based on CPU/Memory
+# Method #2: Scaling applications based on CPU/Memory
 
 ## Overview
 
@@ -243,7 +243,7 @@ oc delete all -l app=hpa-cpu-memory-scaler
 
 <br />
 
-# Scaling apps based on custom metrics
+# Method #3: Scaling applications based on custom metrics
 
 ## 	Overview
 
