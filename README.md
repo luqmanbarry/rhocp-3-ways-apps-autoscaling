@@ -35,9 +35,8 @@ _Helm charts were tested on [Red Hat OpenShift Container Platform](https://docs.
 
 Schedule based scaling uses OpenShift/Kubernetes native resources called CronJob that execute a task periodically (date + time) written in [Cron](https://en.wikipedia.org/wiki/Cron) format. The [scale-up-cronjob.yaml](https://github.com/luqmanbarry/rhocp-3-ways-apps-autoscaling/blob/master/cronjob-scaler/templates/scale-up-cronjob.yaml) template handles patching the deployables to increase their pod replicas; while the [scale-down-cronjob.yaml](https://github.com/luqmanbarry/rhocp-3-ways-apps-autoscaling/blob/master/cronjob-scaler/templates/scale-down-cronjob.yaml) scales them down. Furthermore, the [values.yaml](https://github.com/luqmanbarry/rhocp-3-ways-apps-autoscaling/blob/master/cronjob-scaler/values.yaml) is where details about apps and their scaling specs are declared. Each of these two CronJobs run an **oc patch** command as _entrypoint_ command. 
 
-The [CronJob](https://docs.openshift.com/container-platform/4.10/nodes/jobs/nodes-nodes-jobs.html#nodes-nodes-jobs-about_nodes-nodes-jobs) schedule: "0 22 * * *" times are based on the time zone of the [kube-controller-manager](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/). Unless overridden by the Pod (Container Image or Pod Spec), you can find the kube-controller-manager time zone by creating a sample pod and running the **$ date** command in its terminal.
+The [CronJob](https://docs.openshift.com/container-platform/4.10/nodes/jobs/nodes-nodes-jobs.html#nodes-nodes-jobs-about_nodes-nodes-jobs) `schedule: "0 22 * * *"` times are based on the time zone of the [kube-controller-manager](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/). Unless overridden by the Pod (Container Image or Pod Spec), you can find the kube-controller-manager time zone by creating a sample pod and running the **$ date** command in its terminal.
 
-<br />
 
 ## Implementation
 
@@ -45,7 +44,6 @@ The helm chart creates one scale up and scale down jobs for each app deployable.
 
 The **cronjob-scaler** helm chart github repository is available at [this](https://github.com/luqmanbarry/rhocp-3-ways-apps-autoscaling/blob/master/cronjob-scaler/README.md) location.
 
-<br />
 
 ### Pre-Requisites
 
@@ -54,11 +52,9 @@ The **cronjob-scaler** helm chart github repository is available at [this](https
 * Identification of the kube-controller-manager time zone
 * Workstation with oc, helm binaries installed
 
-<br />
 
 ### Procedure
 
-<br />
 
 #### Identify namespace and deployables target for scheduled scaling
 
@@ -69,8 +65,6 @@ The **cronjob-scaler** helm chart github repository is available at [this](https
 Use [this site](https://crontab.guru/) to generate Cron formatted schedules. 
 
 To identify the kube-controller-manager timezone, run `oc rsh ANY_POD_NAME> date`.
-
-<br />
 
 
 ```
@@ -102,7 +96,6 @@ scaleActions:
       resourceType: Deployment
       replicas: 1
 ```
-
 <br />
 
 #### Install cronjob-scaler Helm Chart
@@ -136,8 +129,6 @@ oc delete cronjob -l app=cronjob-scaler
 
 # Scaling apps based on CPU/Memory
 
-<br />
-
 ## Overview
 
 As a developer, you can use a horizontal pod autoscaler (HPA) to specify how OpenShift Container Platform should automatically increase or decrease the scale of a replication controller or deployment configuration, based on metrics collected from the pods that belong to that replication controller or deployment configuration. You can create an HPA for any deployment, deployment config, replica set, replication controller, or stateful set. -- OpenShift Docs
@@ -145,7 +136,6 @@ As a developer, you can use a horizontal pod autoscaler (HPA) to specify how Ope
 
 Supported metrics The following metrics are supported by horizontal pod autoscaler (HPA):
 
-<br />
 
 <table>
   <tr>
@@ -174,7 +164,6 @@ Supported metrics The following metrics are supported by horizontal pod autoscal
   </tr>
 </table>
 
-<br />
 
 ## Implementation
 
@@ -182,26 +171,22 @@ The **hpa-cpu-memory** helm chart uses dynamic helm template features (ie: range
 
 The hpa-cpu-memory-scaler helm chart github repository is available at [this location](https://github.com/luqmanbarry/rhocp-3-ways-apps-autoscaling/tree/master/hpa-cpu-memory-scaler).
 
-<br />
 
 ### Pre-Requisites
 
 * Access to an OpenShift/Kubernetes cluster
-* Permission to list, get, patch HorizontalPodAutoscaler resources. 
+* Permission to list, get, patch `HorizontalPodAutoscaler` resources. 
 * Workstation with oc, helm binaries installed
 
-<br />
 
 ### Procedure
 
-<br />
 
 #### Identify namespace and deployables target for HPA based scaling
 
-<br />
 
 `DepoymentConfigs, Deployments, StatefulSets` are examples of scalable kubernetes objects.
-<br />
+
 
 #### Prepare the helm chart values.yaml file
 
@@ -220,12 +205,10 @@ hpa:
     maxReplicas: 2
     minReplicas: 1
 ```
-
 <br />
 
 #### Deploy hpa-cpu-memory-scaler helm chart
 
-<br />
 
 ```
 helm uninstall hpa-cpu-memory-scaler || true
@@ -242,7 +225,6 @@ sleep 30
 
 The **loadtest** k8s Deployment in the chart is just an example. 
 
-<br />
 
 ```
 curl http://$(oc get route/loadtest -n ${NAMESPACE} -ojsonpath={.spec.host})/api/loadtest/v1/cpu/3
@@ -258,10 +240,10 @@ helm uninstall hpa-cpu-memory-scaler
 sleep 15
 oc delete all -l app=hpa-cpu-memory-scaler
 ```
+
 <br />
 
 # Scaling apps based on custom metrics
-<br />
 
 ## 	Overview
 
@@ -279,7 +261,6 @@ At the time of writing this article, the Custom Metrics Autoscaler Operator is i
 
 Multiple helm charts are put together to demo this solution. 50% are for setting up the AMQ installation while the other half are for KEDA deployment and configuration. 		
 
-<br />
 
 <table>
   <tr>
@@ -326,7 +307,7 @@ Multiple helm charts are put together to demo this solution. 50% are for setting
   </tr>
 </table>
 
-<br />
+
 
 The custom metric chosen for this demo is **artemis_message_count** metric which is the number of messages currently in a given AMQ queue. This includes scheduled, paged, and in-delivery messages. 
 
@@ -345,7 +326,6 @@ The **rhocp-keda-scaler** helm chart github repository is available at [this loc
 * Permission to _list, get, patch_ Subscriptions, OperatorGroups, InstallPlans resources
 * Workstation with oc, helm binaries installed
 
-<br />
 
 ### Procedure
 
@@ -353,7 +333,6 @@ Take a look at each individual script in the [shell-scripts/](https://github.com
 
 To deploy the entire solution with one command, run sh shell-scripts/install.sh. Likewise to cleanup all deployed resources, run sh shell-scripts/cleanup.sh.
 
-<br />
 
 #### Install AMQ Broker Operator, Custom Resources
 
@@ -362,9 +341,10 @@ To deploy the entire solution with one command, run sh shell-scripts/install.sh.
 ```
 sh ./shell-scripts/install-amq.sh
 ```
+<br />
+
 #### Deploy AMQ Clients -- Producer, Consumer
 
-<br />
 
 ```
 sh shell-scripts/install-amq-clients.sh
@@ -373,11 +353,12 @@ sh shell-scripts/install-amq-clients.sh
 
 #### Install Red Hat OpenShift Custom Metrics Operator
 
-<br />
 
 ```
 sh shell-scripts/install-keda-operator.sh
 ```
+<br />
+
 #### Deploy operator custom resources for apps autoscaling
 
 These resources are deployed in the same namespace as our target apps. 
@@ -385,14 +366,12 @@ These resources are deployed in the same namespace as our target apps.
 ```
 sh shell-scripts/install-keda-crs.sh
 ```
-
 <br />
 
 ## Cleanup
 
 To cleanup everything in one sweep, run sh shell-scripts/cleanup.sh. Otherwise execute the scripts in this order.
 
-<br />
 
 ```
 sh shell-scripts/cleanup-keda-crs.sh
@@ -423,7 +402,6 @@ In this article we’ve learned 3 different methods of natively automating horiz
 * [https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/)
 * [https://crontab.guru/](https://crontab.guru/)
 
-<br />
 
 ## 	Apps Scaler Repositories
 
