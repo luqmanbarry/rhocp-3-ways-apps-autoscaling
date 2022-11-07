@@ -51,7 +51,7 @@ The **cronjob-scaler** helm chart github repository is available at [this](https
 
 #### Prepare the helm chart values.yaml file
 
-Use [https://crontab.guru/](https://crontab.guru/) to generate Cron formatted schedules. 
+Use [this site](https://crontab.guru/) to generate Cron formatted schedules. 
 
 To identify the kube-controller-manager timezone, run `oc rsh ANY_POD_NAME> date`.
 
@@ -352,6 +352,7 @@ In this article we’ve learned 3 different methods of natively automating horiz
 * [https://docs.openshift.com/container-platform/4.10/nodes/pods/nodes-pods-autoscaling-custom.html](https://docs.openshift.com/container-platform/4.10/nodes/pods/nodes-pods-autoscaling-custom.html)
 * [https://docs.openshift.com/container-platform/4.10/nodes/jobs/nodes-nodes-jobs.html#nodes-nodes-jobs-about_nodes-nodes-jobs](https://docs.openshift.com/container-platform/4.10/nodes/jobs/nodes-nodes-jobs.html#nodes-nodes-jobs-about_nodes-nodes-jobs)
 * [https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-controller-manager/)
+* [https://crontab.guru/](https://crontab.guru/)
 
 ## 	Apps Scaler Repositories
 
