@@ -107,6 +107,7 @@ scaleActions:
 helm uninstall cronjob-scaler || true
 
 helm upgrade --install cronjob-scaler ./cronjob-scaler
+
 sleep 30
 ```
 
@@ -211,9 +212,7 @@ hpa:
 ```
 helm uninstall hpa-cpu-memory-scaler || true
 
-helm upgrade --install hpa-cpu-memory-scaler ./hpa-cpu-memory-scaler \
-    -f ${VALUES_FILE} \
-    -n ${NAMESPACE}
+helm upgrade --install hpa-cpu-memory-scaler ./hpa-cpu-memory-scaler
 
 sleep 30
 ```
@@ -235,7 +234,9 @@ watch oc get po
 
 ```
 helm uninstall hpa-cpu-memory-scaler
+
 sleep 15
+
 oc delete all -l app=hpa-cpu-memory-scaler
 ```
 
