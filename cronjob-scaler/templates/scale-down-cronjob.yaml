@@ -26,7 +26,7 @@ spec:
             - |
                 set -e
             {{- range $component := .Values.scaleActions.scaleDown.components }}
-                oc patch {{ $component.resourceType }}/{{ $component.name }} --type='json' -p='[{"op": "replace", "path": "/spec/replicas", "value": "{{ $component.replicas }}" }]'
+                oc patch {{ $component.resourceType }}/{{ $component.name }} --type='json' -p='[{"op": "replace", "path": "/spec/replicas", "value": {{ $component.replicas }} }]'
             {{- end }}
                 set +e
 ---
