@@ -2,29 +2,52 @@
 serviceAccountName: cronjob-scaler
 
 scaleActions:
-  scaleUp:
+  scaleUps:
     # Provide input in Cron Format -- Date/Time must be in UTC time zone
-    schedule: "0 3 * * *"  
-    components:
-    - name: app1
-      resourceType: Deployment
-      replicas: 2
-    - name: app2
-      resourceType: Deployment
-      replicas: 2
-    - name: app3
-      resourceType: Deployment
-      replicas: 2
-  scaleDown:
+    - name: "scale-up-every-monday-at-3am-utc"  # Use hyphens to separate words
+      schedule: "0 3 * * 1"  # https://crontab.guru/#0_3_*_*_1
+      components:
+      - name: app1
+        resourceType: Deployment
+        replicas: 3
+      - name: app2
+        resourceType: Deployment
+        replicas: 3
+      - name: app3
+        resourceType: Deployment
+        replicas: 3
+      - name: app4
+        resourceType: Deployment
+        replicas: 3
+      - name: app5
+        resourceType: Deployment
+        replicas: 3
+      - name: app6
+        resourceType: Deployment
+        replicas: 3
+  scaleDowns:
     # Provide input in Cron Format -- Date/Time must be in UTC time zone
-    schedule: "0 5 * * *" 
-    components:
-    - name: app1
-      resourceType: Deployment
-      replicas: 1
-    - name: app2
-      resourceType: Deployment
-      replicas: 1
-    - name: app3
-      resourceType: Deployment
-      replicas: 1
+    - name: "scale-down-every-friday-at-1am-utc"  # Use hyphens to separate words
+      schedule: "0 1 * * 5"  # https://crontab.guru/#0_1_*_*_5
+      components:
+      - name: app1
+        resourceType: Deployment
+        replicas: 0
+      - name: app2
+        resourceType: Deployment
+        replicas: 0
+      - name: app3
+        resourceType: Deployment
+        replicas: 0
+    - name: "scale-down-every-saturday-at-8pm-utc"  # Use hyphens to separate words
+      schedule: "0 20 * * 6"  # https://crontab.guru/#0_20_*_*_6
+      components:
+      - name: app4
+        resourceType: Deployment
+        replicas: 0
+      - name: app5
+        resourceType: Deployment
+        replicas: 0
+      - name: app6
+        resourceType: Deployment
+        replicas: 0
