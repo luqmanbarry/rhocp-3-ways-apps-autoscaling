@@ -1,32 +1,34 @@
+{{- range $scaleUp := .Values.scaleActions.scaleUps }}
+---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ include "cronjob-scaler.name" . }}-scale-up
-  namespace: {{ include "cronjob-scaler.namespace" . }}
+  name: "{{ $scaleUp.name }}"
+  namespace: {{ include "cronjob-scaler.namespace" $ }}
   labels:
-    {{- include "cronjob-scaler.labels" . | nindent 4 }}
+    {{- include "cronjob-scaler.labels" $ | nindent 4 }}
 spec:
-  schedule: "{{ .Values.scaleActions.scaleUp.schedule }}"
+  schedule: "{{ $scaleUp.schedule }}"
   jobTemplate:
     spec:
       template:
         metadata:
           labels:
-            {{- include "cronjob-scaler.labels" . | nindent 12 }}
+            {{- include "cronjob-scaler.labels" $ | nindent 12 }}
         spec:
-          serviceAccountName: "{{ .Values.serviceAccountName }}"
-          serviceAccount: "{{ .Values.serviceAccountName }}"
+          serviceAccountName: "{{ $.Values.serviceAccountName }}"
+          serviceAccount: "{{ $.Values.serviceAccountName }}"
           restartPolicy: Never
           containers:
-          - name: {{ include "cronjob-scaler.name" . }}-scale-up
-            image: registry.redhat.io/openshift4/ose-cli:v4.10
+          - name: "{{ $scaleUp.name }}"
+            image: registry.redhat.io/openshift4/ose-cli:latest
             command:
             - /bin/sh
             - -c
             - |
                 set -e
-            {{- range $component := .Values.scaleActions.scaleUp.components }}
+            {{- range $component := $scaleUp.components }}
                 oc patch {{ $component.resourceType }}/{{ $component.name }} --type='json' -p='[{"op": "replace", "path": "/spec/replicas", "value": {{ $component.replicas }} }]'
             {{- end }}
                 set +e
----
+{{ end }}
